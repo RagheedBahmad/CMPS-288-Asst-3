@@ -18,7 +18,7 @@ public class Player : MonoBehaviour
     {
         var pos = transform.position;
         var mouse = camera.ScreenToWorldPoint(Input.mousePosition);
-        var x = Mathf.Clamp(mouse.x, -10, 10);
+        var x = Mathf.Clamp(mouse.x, -14, 14);
         transform.position = new Vector2(x, pos.y);
     }
 }
