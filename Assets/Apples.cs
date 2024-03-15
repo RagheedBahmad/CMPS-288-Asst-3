@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Apples : MonoBehaviour
@@ -36,15 +37,17 @@ public class Apples : MonoBehaviour
             var pause = new WaitForSeconds(Random.Range(2f, 10f)); // calculates new random delay
         
             var position = new Vector3(x, Screen.height + 50, 0); // defines position
-            var pos = Camera.main.ScreenToWorldPoint(position); // translates position
+            var pos = camera.ScreenToWorldPoint(position); // translates position
             pos.z = 0; // ensures z index is 0
 
             var weight = Random.Range(1, 11);
             var apple = Instantiate(myPrefab, pos, Quaternion.identity); // spawns the apple
             apple.AddComponent<AppleProperties>().weight = weight;
             
-            //interpolate the size to be in range 0.5 to 1 in proportion to weight (of range 1 to 10)
+            // interpolate the size to be in range 0.5 to 1 in proportion to weight (of range 1 to 10)
             var size = (weight - 1) / 9f * 0.5f + 0.5f;
+            // change radius of collider to match size
+            apple.GetComponent<CircleCollider2D>().radius *= size;
             apple.transform.localScale = new Vector2(size, size);
             Destroy(apple, 4); // destroys apple after 4 seconds 
 
@@ -55,6 +58,6 @@ public class Apples : MonoBehaviour
 
 public class AppleProperties : MonoBehaviour
 {
-    public float weight;
+    public int weight;
 }
 
