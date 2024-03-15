@@ -39,11 +39,22 @@ public class Apples : MonoBehaviour
             var pos = Camera.main.ScreenToWorldPoint(position); // translates position
             pos.z = 0; // ensures z index is 0
 
+            var weight = Random.Range(1, 11);
             var apple = Instantiate(myPrefab, pos, Quaternion.identity); // spawns the apple
+            apple.AddComponent<AppleProperties>().weight = weight;
+            
+            //interpolate the size to be in range 0.5 to 1 in proportion to weight (of range 1 to 10)
+            var size = (weight - 1) / 9f * 0.5f + 0.5f;
+            apple.transform.localScale = new Vector2(size, size);
             Destroy(apple, 4); // destroys apple after 4 seconds 
 
             yield return pause; // waits for the random interval
         }
     }
+}
+
+public class AppleProperties : MonoBehaviour
+{
+    public float weight;
 }
 
