@@ -3,25 +3,22 @@ using UnityEngine.SceneManagement;
 
 public class GameOverManager : MonoBehaviour
 {
-    public GameObject gameOverText; // Assign in the Inspector
-    public GameObject restartButton; // Assign in the Inspector
+    public GameObject gameOverText;
+    public GameObject restartButton; 
 
-    void Start()
+    void Start() // hide text and button initially
     {
-        // Hide Game Over text and restart button at the start
         gameOverText.SetActive(false);
         restartButton.SetActive(false);
     }
 
-    // Call this method to display the Game Over UI
-    public void ShowGameOverScreen()
+    public void ShowGameOverScreen() // show text and button
     {
         gameOverText.SetActive(true);
         restartButton.SetActive(true);
     }
 
-    // Method linked to the restart button
-    public void RestartGame()
+    public void RestartGame() // restart scene
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }

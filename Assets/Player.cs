@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
     public HealthDisplay healthDisplay;
     private AudioSource _audioSource;
     public AudioClip[] audioClips;
+
+    private Boolean _isGameOver = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,61 +25,69 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        var pos = transform.position;
-        var mouse = camera.ScreenToWorldPoint(Input.mousePosition);
-        var x = Mathf.Clamp(mouse.x, -14, 14);
-        transform.position = new Vector2(x, pos.y);
+        if (!_isGameOver)
+        {
+            var pos = transform.position; // get player position
+            var mouse = camera.ScreenToWorldPoint(Input.mousePosition); // get mouse position in world
+            var x = Mathf.Clamp(mouse.x, -14, 14); // stops the player from going out of bounds
+            transform.position = new Vector2(x, pos.y); // moves player with mouse
+        }
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var health = GetComponent<GameData>().playerHealth;
-        if (collision.CompareTag("Apple"))
+        var health = GetComponent<GameData>().playerHealth; // stores health in variable
+        if (collision.CompareTag("Apple")) // if hit apple
         {
-            health += collision.gameObject.GetComponent<AppleProperties>().weight;
-            health = Math.Min(health, 100);
-            GetComponent<GameData>().playerHealth = health;
-            healthDisplay.UpdateHealth(health);
-            _audioSource.clip = audioClips[0];
-            _audioSource.Play();
-            Destroy(collision.gameObject);
+            health += collision.gameObject.GetComponent<AppleProperties>().weight; // add apple's weight to health
+            health = Math.Min(health, 100); // clamp the health at 100
+            GetComponent<GameData>().playerHealth = health; // update health in GameData class
+            healthDisplay.UpdateHealth(health); // update health in the display
+            _audioSource.clip = audioClips[0]; // load appropriate audio
+            _audioSource.Play(); // play audio
+            Destroy(collision.gameObject); // destroy apple
         }
 
-        if (collision.CompareTag("Axe"))
+        if (collision.CompareTag("Axe")) // if hit axe
         {
-            health -= 10;
-            health = Math.Max(health, 0);
-            GetComponent<GameData>().playerHealth = health;
-            healthDisplay.UpdateHealth(health);
-            _audioSource.clip = audioClips[1];
-            _audioSource.Play();
-            Destroy(collision.gameObject);
+            health -= 10; // remove 10 health
+            health = Math.Max(health, 0); // clamp health at 0
+            GetComponent<GameData>().playerHealth = health; // update health in GameData
+            healthDisplay.UpdateHealth(health); // update display
+            _audioSource.clip = audioClips[1]; // load appropriate audio
+            _audioSource.Play(); // and play it
+            Destroy(collision.gameObject); // destroy axe
             
-            var renderer = GetComponent<Renderer>();
+            var renderer = GetComponent<Renderer>(); // get renderer for flicker effect
 
-            if (health != 0)
+            if (health != 0) // if not dead flicker
             {
                 StartCoroutine(Flicker(renderer));
-            } else {
-                FindObjectOfType<Axes>().GameOver();
-                FindObjectOfType<Apples>().GameOver();
-                FindObjectOfType<GameOverManager>().ShowGameOverScreen();
-                GameObject.FindGameObjectWithTag("Forest").GetComponent<AudioSource>().Stop();
-                _audioSource.clip = audioClips[2];
-                _audioSource.Play();
-                StartCoroutine(Death());
+            } else { // if dead go to game over
+                _isGameOver = true;
+                foreach (var apple in GameObject.FindGameObjectsWithTag("Apple"))
+                {
+                    Destroy(apple);
+                }
+                FindObjectOfType<Axes>().GameOver(); // stops axe spawner
+                FindObjectOfType<Apples>().GameOver(); // stops apple spawner
+                FindObjectOfType<GameOverManager>().ShowGameOverScreen(); // shows game over screen
+                GameObject.FindGameObjectWithTag("Forest").GetComponent<AudioSource>().Stop(); // stops music
+                _audioSource.clip = audioClips[2]; // loads game over chime
+                _audioSource.Play(); // plays it
+                StartCoroutine(Death()); // starts death coroutine
             }
         }
     }
 
     IEnumerator Flicker(Renderer rend)
     {
-        var loop = StartCoroutine(FlickerLoop(rend));
-        yield return new WaitForSeconds(1f);
-        StopCoroutine(loop);
-        rend.enabled = true;
+        var loop = StartCoroutine(FlickerLoop(rend)); // loop that flickers that player
+        yield return new WaitForSeconds(1f); // plays the flicker for 1 second
+        StopCoroutine(loop); // stops the effect
+        rend.enabled = true; // ensures the renderer is enabled
     }
 
-    IEnumerator FlickerLoop(Renderer rend)
+    IEnumerator FlickerLoop(Renderer rend) // loop that flickers the player
     {
         while (true)
         {
@@ -88,14 +98,14 @@ public class Player : MonoBehaviour
         }
     }
 
-    IEnumerator Death()
+    IEnumerator Death() // death animation
     {
-        yield return new WaitForSeconds(0.5f);
-        var rb = this.AddComponent<Rigidbody2D>();
-        var x = Random.Range(-10f, 10f);
-        rb.velocity = new Vector2(x, 10f);
-        rb.angularVelocity = Random.Range(-200f, 200f);
-        Destroy(this, 10);
+        yield return new WaitForSeconds(1f); // waits for a second for dramatic effect
+        var rb = this.AddComponent<Rigidbody2D>(); // adds rigid body for gravity 
+        var x = Random.Range(-5f, 5f); // calculates random x velocity
+        rb.velocity = new Vector2(x, 25f); // gives the player that velocity
+        rb.angularVelocity = Random.Range(-200f, 200f); // spins the player in either direction
+        Destroy(this, 10); // destroy the player after 10 seconds
     }
 }
 
