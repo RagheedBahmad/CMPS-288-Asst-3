@@ -1,19 +1,21 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Apples : MonoBehaviour
 {
-    public GameObject myPrefab;
+    private Coroutine[] _spawnerCoroutines = new Coroutine[4];
+    private AudioSource _audioSource;
+    public GameObject Apple;
     Camera camera = new Camera();
     
     // Start is called before the first frame update
     void Start()
     {
+        _audioSource = GetComponent<AudioSource>();
         camera = Camera.main;
         for (int i = 0; i < 4; i++)
         {
-            StartCoroutine(Spawner(i));
+            _spawnerCoroutines[i] = StartCoroutine(Spawner(i));
         }
     }
 
@@ -35,13 +37,14 @@ public class Apples : MonoBehaviour
         while (true)
         {
             var pause = new WaitForSeconds(Random.Range(2f, 10f)); // calculates new random delay
-        
-            var position = new Vector3(x, Screen.height + 50, 0); // defines position
+            var randomX = Random.Range(x1, x2);
+            var position = new Vector3(randomX, Screen.height + 50, 0); // defines position
             var pos = camera.ScreenToWorldPoint(position); // translates position
             pos.z = 0; // ensures z index is 0
 
             var weight = Random.Range(1, 11);
-            var apple = Instantiate(myPrefab, pos, Quaternion.identity); // spawns the apple
+            var apple = Instantiate(Apple, pos, Quaternion.identity); // spawns the apple
+            _audioSource.Play();
             apple.AddComponent<AppleProperties>().weight = weight;
             
             // interpolate the size to be in range 0.5 to 1 in proportion to weight (of range 1 to 10)
@@ -53,6 +56,11 @@ public class Apples : MonoBehaviour
 
             yield return pause; // waits for the random interval
         }
+    }
+    
+    public void GameOver()
+    {
+        for(int i = 0; i < 4; i++) StopCoroutine(_spawnerCoroutines[i]);
     }
 }
 
