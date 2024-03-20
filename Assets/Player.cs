@@ -103,7 +103,7 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(1f); // waits for a second for dramatic effect
         var rb = this.AddComponent<Rigidbody2D>(); // adds rigid body for gravity 
         var x = Random.Range(-5f, 5f); // calculates random x velocity
-        rb.velocity = new Vector2(x, 25f); // gives the player that velocity
+        rb.velocity = new Vector2(x, 15f); // gives the player that velocity
         rb.angularVelocity = Random.Range(-200f, 200f); // spins the player in either direction
         Destroy(this, 10); // destroy the player after 10 seconds
     }
