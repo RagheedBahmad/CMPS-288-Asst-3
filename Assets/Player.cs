@@ -49,7 +49,7 @@ public class Player : MonoBehaviour
 
         if (collision.CompareTag("Axe")) // if hit axe
         {
-            health -= 10; // remove 10 health
+            health -= 20; // remove 20 health
             health = Math.Max(health, 0); // clamp health at 0
             GetComponent<GameData>().playerHealth = health; // update health in GameData
             healthDisplay.UpdateHealth(health); // update display
