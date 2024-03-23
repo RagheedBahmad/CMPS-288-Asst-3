@@ -55,8 +55,12 @@ public class Player : MonoBehaviour
             healthDisplay.UpdateHealth(health); // update display
             _audioSource.clip = audioClips[1]; // load appropriate audio
             _audioSource.Play(); // and play it
-            Destroy(collision.gameObject); // destroy axe
-            
+
+            var axe = collision.gameObject;
+            axe.GetComponent<BoxCollider2D>().enabled = false; // to avoid the axe hitting the player more than once
+            axe.GetComponent<Rigidbody2D>().velocity = new Vector3(1, 0); // gives it a bouncing off effect
+            axe.GetComponent<Rigidbody2D>().angularVelocity = 0; // stops its rotation
+
             var renderer = GetComponent<Renderer>(); // get renderer for flicker effect
 
             if (health != 0) // if not dead flicker

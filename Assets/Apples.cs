@@ -45,8 +45,6 @@ public class Apples : MonoBehaviour
             // I found directly mapping weight to size creates very small apples
             // this is more visually appealing
             var size = (weight - 1) / 9f * 0.5f + 0.5f;
-            // change radius of collider to match size
-            apple.GetComponent<CircleCollider2D>().radius *= size;
             apple.transform.localScale = new Vector2(size, size); // updates apple's size
             Destroy(apple, 4); // destroys apple after 4 seconds 
 
